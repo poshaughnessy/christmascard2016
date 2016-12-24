@@ -7,6 +7,9 @@ var SNOWFLAKE_SIZE_MAX = 60;
 var SNOWFLAKE_SPEED_MIN = 0.75;
 var SNOWFLAKE_SPEED_MAX = 2;
 
+var SNOWFLAKE_ROTATE_SPEED_MIN = -0.025;
+var SNOWFLAKE_ROTATE_SPEED_MAX = 0.025;
+
 var snowflakeRate = SNOWFLAKE_RATE_DEFAULT;
 
 var width = window.innerWidth;
@@ -19,6 +22,9 @@ var stage = new PIXI.Container();
 var Snowflake = function() {
   this.speed = getRandomBetween(SNOWFLAKE_SPEED_MIN, SNOWFLAKE_SPEED_MAX);
   this.size = getRandomBetween(SNOWFLAKE_SIZE_MIN, SNOWFLAKE_SIZE_MAX);
+  this.position = getRandomStartingPosition(this.size);
+  this.rotation = getRandomStartingRotation();
+  this.rotateSpeed = getRandomBetween(SNOWFLAKE_ROTATE_SPEED_MIN, SNOWFLAKE_ROTATE_SPEED_MAX);
 };
 
 var snowflakes = [];
@@ -50,12 +56,12 @@ function init() {
 function createSnowflake() {
 
   var snowflake = new Snowflake();
-  snowflake.graphics = createSnowflakeGraphics(snowflake.size);
+  snowflake.graphics = createSnowflakeGraphics(snowflake.size, snowflake.position, snowflake.rotation);
   return snowflake;
 
 }
 
-function createSnowflakeGraphics(size) {
+function createSnowflakeGraphics(size, position, rotation) {
 
   var graphics = new PIXI.Graphics();
   var triangleLength = size/3;
@@ -80,11 +86,14 @@ function createSnowflakeGraphics(size) {
   graphics.lineTo(pos.x += triangleLength/2, pos.y -= triangleLength);
   graphics.lineTo(pos.x -= triangleLength/2, pos.y -= triangleLength);
 
-  var pos = getRandomStartingPosition(size);
-  graphics.position.x = pos.x;
-  graphics.position.y = pos.y;
+  graphics.position.x = position.x;
+  graphics.position.y = position.y;
 
-  graphics.rotation = getRandomStartingRotation();
+  graphics.rotation = rotation;
+
+  // Set the centre for rotation
+  graphics.pivot.x = size/2;
+  graphics.pivot.y = size/2;
 
   return graphics;
 
@@ -123,6 +132,7 @@ function updateOnFrame() {
 
       // Still going...
       snowflake.graphics.position.y += snowflake.speed;
+      snowflake.graphics.rotation += snowflake.rotateSpeed;
 
     } else {
 
