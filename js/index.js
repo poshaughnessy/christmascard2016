@@ -1,8 +1,11 @@
 var SNOWFLAKE_COLOUR = 0xFFFFFF;
-var SNOWFLAKE_RATE_DEFAULT = 10;
-var SNOWFLAKE_SIZE = 30;
-var TRIANGLE_LENGTH = SNOWFLAKE_SIZE / 3;
-var SNOWFLAKE_SPEED = 1;
+var SNOWFLAKE_RATE_DEFAULT = 100;
+
+var SNOWFLAKE_SIZE_MIN = 30;
+var SNOWFLAKE_SIZE_MAX = 60;
+
+var SNOWFLAKE_SPEED_MIN = 0.75;
+var SNOWFLAKE_SPEED_MAX = 2;
 
 var snowflakeRate = SNOWFLAKE_RATE_DEFAULT;
 
@@ -11,8 +14,13 @@ var height = window.innerHeight;
 var container = document.getElementById('container');
 
 var renderer = new PIXI.autoDetectRenderer(width, height, {transparent: false, antialias: true});
-
 var stage = new PIXI.Container();
+
+var Snowflake = function() {
+  this.speed = getRandomBetween(SNOWFLAKE_SPEED_MIN, SNOWFLAKE_SPEED_MAX);
+  this.size = getRandomBetween(SNOWFLAKE_SIZE_MIN, SNOWFLAKE_SIZE_MAX);
+};
+
 var snowflakes = [];
 
 init();
@@ -27,7 +35,7 @@ function init() {
 
   for (var i=0; i < snowflakeRate; i++) {
     var snowflake = createSnowflake();
-    stage.addChild( snowflake );
+    stage.addChild( snowflake.graphics );
     snowflakes.push( snowflake );
   }
 
@@ -36,52 +44,61 @@ function init() {
 }
 
 /**
- * We're making the second shape shown here:
- * http://mathworld.wolfram.com/KochSnowflake.html
+ * We're making a Kock Snowflake - a shape made up of 6 equilateral triangles (60 degs)
+ * It's the second shape shown here: http://mathworld.wolfram.com/KochSnowflake.html
  */
 function createSnowflake() {
 
-  var snowflake = new PIXI.Graphics();
+  var snowflake = new Snowflake();
+  snowflake.graphics = createSnowflakeGraphics(snowflake.size);
+  return snowflake;
+
+}
+
+function createSnowflakeGraphics(size) {
+
+  var graphics = new PIXI.Graphics();
+  var triangleLength = size/3;
 
   // Start at the edge of the top left triangle
-  // a^2 + b^2 = c^2, a=TRIANGLE_LENGTH/2, b=?, c=SNOWFLAKE_TRIANGLE
-  var triangleHeight = Math.sqrt((TRIANGLE_LENGTH/2 * TRIANGLE_LENGTH/2) + (TRIANGLE_LENGTH * TRIANGLE_LENGTH));
+  // a^2 + b^2 = c^2, a=triangleLength/2, b=?, c=triangleLength
+  var triangleHeight = Math.sqrt((triangleLength * triangleLength) - (triangleLength/2 * triangleLength/2));
   var pos = {x: 0, y: triangleHeight};
 
-  snowflake.lineStyle(2, SNOWFLAKE_COLOUR, 1);
-  snowflake.moveTo(pos.x, pos.y);
-  snowflake.lineTo(pos.x += TRIANGLE_LENGTH, pos.y);
-  snowflake.lineTo(pos.x += TRIANGLE_LENGTH/2, pos.y -= triangleHeight);
-  snowflake.lineTo(pos.x += TRIANGLE_LENGTH/2, pos.y += triangleHeight);
-  snowflake.lineTo(pos.x += TRIANGLE_LENGTH, pos.y);
-  snowflake.lineTo(pos.x -= TRIANGLE_LENGTH/2, pos.y += TRIANGLE_LENGTH);
-  snowflake.lineTo(pos.x += TRIANGLE_LENGTH/2, pos.y += TRIANGLE_LENGTH);
-  snowflake.lineTo(pos.x -= TRIANGLE_LENGTH, pos.y);
-  snowflake.lineTo(pos.x -= TRIANGLE_LENGTH/2, pos.y += TRIANGLE_LENGTH);
-  snowflake.lineTo(pos.x -= TRIANGLE_LENGTH/2, pos.y -= TRIANGLE_LENGTH);
-  snowflake.lineTo(pos.x -= TRIANGLE_LENGTH, pos.y);
-  snowflake.lineTo(pos.x += TRIANGLE_LENGTH/2, pos.y -= TRIANGLE_LENGTH);
-  snowflake.lineTo(pos.x -= TRIANGLE_LENGTH/2, pos.y -= TRIANGLE_LENGTH);
+  graphics.lineStyle(2, SNOWFLAKE_COLOUR, 1);
+  graphics.moveTo(pos.x, pos.y);
+  graphics.lineTo(pos.x += triangleLength, pos.y);
+  graphics.lineTo(pos.x += triangleLength/2, pos.y -= triangleHeight);
+  graphics.lineTo(pos.x += triangleLength/2, pos.y += triangleHeight);
+  graphics.lineTo(pos.x += triangleLength, pos.y);
+  graphics.lineTo(pos.x -= triangleLength/2, pos.y += triangleLength);
+  graphics.lineTo(pos.x += triangleLength/2, pos.y += triangleLength);
+  graphics.lineTo(pos.x -= triangleLength, pos.y);
+  graphics.lineTo(pos.x -= triangleLength/2, pos.y += triangleLength);
+  graphics.lineTo(pos.x -= triangleLength/2, pos.y -= triangleLength);
+  graphics.lineTo(pos.x -= triangleLength, pos.y);
+  graphics.lineTo(pos.x += triangleLength/2, pos.y -= triangleLength);
+  graphics.lineTo(pos.x -= triangleLength/2, pos.y -= triangleLength);
 
-  var pos = getRandomStartingPosition();
-  snowflake.position.x = pos.x;
-  snowflake.position.y = pos.y;
+  var pos = getRandomStartingPosition(size);
+  graphics.position.x = pos.x;
+  graphics.position.y = pos.y;
 
-  snowflake.rotation = getRandomStartingRotation();
+  graphics.rotation = getRandomStartingRotation();
 
-  return snowflake;
+  return graphics;
 
 }
 
 /**
  * Start above the top of the screen
  */
-function getRandomStartingPosition() {
+function getRandomStartingPosition(size) {
 
   var rnd = Math.random();
   var x = rnd * width;
   rnd = Math.random();
-  var y = rnd * -height/2;
+  var y = -size - rnd * (height - size);
 
   return {x: x, y: y};
 
@@ -91,11 +108,29 @@ function getRandomStartingRotation() {
   return Math.random() * Math.PI * 2;
 }
 
+function getRandomBetween(min, max) {
+  var rnd = Math.random();
+  return min + rnd * (max - min);
+}
+
 function updateOnFrame() {
 
   for (var i=0; i < snowflakes.length; i++) {
+
     var snowflake = snowflakes[i];
-    snowflake.position.y += SNOWFLAKE_SPEED;
+
+    if (snowflake.graphics.position.y < height + snowflake.size) {
+
+      // Still going...
+      snowflake.graphics.position.y += snowflake.speed;
+
+    } else {
+
+      // Fallen off the bottom, reset to another starting position
+      var pos = getRandomStartingPosition(snowflake.size);
+      snowflake.graphics.position.x = pos.x;
+      snowflake.graphics.position.y = pos.y;
+    }
   }
 
 }
