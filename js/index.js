@@ -18,18 +18,39 @@ var snowflakeRate = SNOWFLAKE_RATE_DEFAULT;
 var width = window.innerWidth;
 var height = window.innerHeight;
 var container = document.getElementById('container');
+var scoreElement = document.getElementById('score');
 
 var renderer = new PIXI.autoDetectRenderer(width, height, {transparent: false, antialias: true});
 var stage = new PIXI.Container();
 
+var score = 0;
+
 var jingleSound;
 
 var Snowflake = function() {
+
   this.speed = getRandomBetween(SNOWFLAKE_SPEED_MIN, SNOWFLAKE_SPEED_MAX);
   this.size = getRandomBetween(SNOWFLAKE_SIZE_MIN, SNOWFLAKE_SIZE_MAX);
   this.rotateSpeed = getRandomBetween(SNOWFLAKE_ROTATE_SPEED_MIN, SNOWFLAKE_ROTATE_SPEED_MAX);
-  this.graphics = createGraphics(this.size, getRandomStartingPosition(this.size), getRandomStartingRotation());
+
+  this.isLogo = Math.random() <= LOGOS_RATIO;
+  this.graphics = createGraphics(this.isLogo, this.size, getRandomStartingPosition(this.size),
+    getRandomStartingRotation());
+
   this.colliding = false;
+
+  this.graphics.interactive = true;
+  this.graphics.on('mousedown', this.onClick.bind(this));
+  this.graphics.on('touchstart', this.onClick.bind(this));
+};
+
+Snowflake.prototype.onClick = function() {
+  console.log('click!', this.index);
+  if (this.isLogo) {
+    updateScore(-1);
+  } else {
+    updateScore(1);
+  }
 };
 
 Snowflake.prototype.getPosition = function() {
@@ -128,16 +149,20 @@ function init() {
 
 }
 
+function updateScore(delta) {
+  score += delta;
+  scoreElement.innerHTML = score;
+}
+
 /**
  * We're making a Koch Snowflake - a shape made up of 6 equilateral triangles (60 degs)
  * It's the second shape shown here: http://mathworld.wolfram.com/KochSnowflake.html
  */
-function createGraphics(size, position, rotation) {
+function createGraphics(isLogo, size, position, rotation) {
 
-  var rnd = Math.random();
   var graphics;
 
-  if (rnd <= LOGOS_RATIO) {
+  if (isLogo) {
     graphics = createRandomLogoSprite(size);
   } else {
     graphics = createSnowflakeGraphic(size);
@@ -181,6 +206,8 @@ function createSnowflakeGraphic(size) {
   graphics.lineTo(pos.x += triangleLength/2, pos.y -= triangleLength);
   graphics.lineTo(pos.x -= triangleLength/2, pos.y -= triangleLength);
 
+  graphics.hitArea = new PIXI.Rectangle(0, 0, size, size);
+
   return graphics;
 
 }
@@ -189,8 +216,10 @@ function createRandomLogoSprite(size) {
 
   var logoIndex = Math.floor(Math.random() * LOGOS.length);
   var sprite = new PIXI.Sprite.fromImage('img/' + LOGOS[logoIndex]);
+
   sprite.width = size;
   sprite.height = size;
+
   return sprite;
 
 }
