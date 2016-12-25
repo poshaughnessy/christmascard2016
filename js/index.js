@@ -10,6 +10,9 @@ var SNOWFLAKE_SPEED_MAX = 2;
 var SNOWFLAKE_ROTATE_SPEED_MIN = -0.025;
 var SNOWFLAKE_ROTATE_SPEED_MAX = 0.025;
 
+var LOGOS = ['sbrowser5.svg', 'bubble.svg', 'podle.svg', 'snapwat.svg'];
+var LOGOS_RATIO = 0.25;
+
 var snowflakeRate = SNOWFLAKE_RATE_DEFAULT;
 
 var width = window.innerWidth;
@@ -25,6 +28,7 @@ var Snowflake = function() {
   this.position = getRandomStartingPosition(this.size);
   this.rotation = getRandomStartingRotation();
   this.rotateSpeed = getRandomBetween(SNOWFLAKE_ROTATE_SPEED_MIN, SNOWFLAKE_ROTATE_SPEED_MAX);
+  this.graphics = createGraphics(this.size, this.position, this.rotation);
 };
 
 var snowflakes = [];
@@ -40,7 +44,7 @@ function init() {
   container.appendChild(renderer.view);
 
   for (var i=0; i < snowflakeRate; i++) {
-    var snowflake = createSnowflake();
+    var snowflake = new Snowflake();
     stage.addChild( snowflake.graphics );
     snowflakes.push( snowflake );
   }
@@ -50,18 +54,34 @@ function init() {
 }
 
 /**
- * We're making a Kock Snowflake - a shape made up of 6 equilateral triangles (60 degs)
+ * We're making a Koch Snowflake - a shape made up of 6 equilateral triangles (60 degs)
  * It's the second shape shown here: http://mathworld.wolfram.com/KochSnowflake.html
  */
-function createSnowflake() {
+function createGraphics(size, position, rotation) {
 
-  var snowflake = new Snowflake();
-  snowflake.graphics = createSnowflakeGraphics(snowflake.size, snowflake.position, snowflake.rotation);
-  return snowflake;
+  var rnd = Math.random();
+  var graphics;
+
+  if (rnd <= LOGOS_RATIO) {
+    graphics = createRandomLogoSprite(size);
+  } else {
+    graphics = createSnowflakeGraphic(size);
+  }
+
+  graphics.position.x = position.x;
+  graphics.position.y = position.y;
+
+  graphics.rotation = rotation;
+
+  // Set the centre for rotation
+  graphics.pivot.x = size/2;
+  graphics.pivot.y = size/2;
+
+  return graphics;
 
 }
 
-function createSnowflakeGraphics(size, position, rotation) {
+function createSnowflakeGraphic(size) {
 
   var graphics = new PIXI.Graphics();
   var triangleLength = size/3;
@@ -86,16 +106,17 @@ function createSnowflakeGraphics(size, position, rotation) {
   graphics.lineTo(pos.x += triangleLength/2, pos.y -= triangleLength);
   graphics.lineTo(pos.x -= triangleLength/2, pos.y -= triangleLength);
 
-  graphics.position.x = position.x;
-  graphics.position.y = position.y;
-
-  graphics.rotation = rotation;
-
-  // Set the centre for rotation
-  graphics.pivot.x = size/2;
-  graphics.pivot.y = size/2;
-
   return graphics;
+
+}
+
+function createRandomLogoSprite(size) {
+
+  var logoIndex = Math.floor(Math.random() * LOGOS.length);
+  var sprite = new PIXI.Sprite.fromImage('img/' + LOGOS[logoIndex]);
+  sprite.width = size;
+  sprite.height = size;
+  return sprite;
 
 }
 
