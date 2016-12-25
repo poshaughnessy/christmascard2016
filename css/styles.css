@@ -1,13 +1,30 @@
 body {
   margin: 0;
   padding: 0;
-  background-color: #987fff;
   font-family: "Helvetic Neue", Helvetica, Arial, sans-serif;
+  background-color: #987fff;
+  color: #fff;
+}
+
+h1 {
+
+}
+
+.instructions {
+  margin-top: 1.5em;
+  font-style: italic;
+}
+
+#snowflake {
+  width: 150px;
+  height: 150px;
+  margin: 1em auto;
 }
 
 #container {
   width: 100%;
   height: 100%;
+  display: none;
 }
 
 #score {
@@ -20,4 +37,39 @@ body {
   text-shadow: 1px 1px 1px #7A59FF;
 }
 
+.page {
+  z-index: 2;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 10px;
+  text-align: center;
+  background: #987fff;
+}
 
+.modal p {
+  font-size: 1.4em;
+}
+
+button {
+  cursor: pointer;
+  font-size: 2em;
+  color: #fff;
+  background-color: #7754ff;
+  border: 0;
+  border-radius: 8px;
+  padding: 10px 20px;
+}
+
+#intro-start {
+  margin-top: 1.5em;
+}
+
+#result {
+  display: none;
+}
+
+#result-score {
+  font-size: 2.5em;
+}

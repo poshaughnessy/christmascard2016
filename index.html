@@ -8,8 +8,23 @@
   <body>
     <div id="score">0</div>
     <div id="container"></div>
-    <script src="js/pixi.min.js"></script>
-    <script src="js/howler.min.js"></script>
+    <div id="intro" class="page">
+      <div id="snowflake"></div>
+      <h1>Snag the Snowflakes!</h1>
+      <p class="instructions">Tap the snowflakes, but avoid the beautiful logos!</p>
+      <button id="intro-start">Start</button>
+    </div>
+    <div id="result" class="page">
+      <p>You scored</p>
+      <p id="result-score"></p>
+      <p id="result-message"></p>
+      <button id="result-retry">Play again</button>
+    </div>
+    <script src="js/lib/pixi.min.js"></script>
+    <script src="js/lib/howler.min.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/snowflake.js"></script>
+    <script src="js/game.js"></script>
     <script src="js/index.js"></script>
   </body>
 <body>
