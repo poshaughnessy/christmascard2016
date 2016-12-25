@@ -46,7 +46,7 @@ function init() {
 
   snowflakeContainer.appendChild(introRenderer.view);
 
-  introSnowflake = new Snowflake(null, {noLogo: true});
+  introSnowflake = new Snowflake(null, {displayOnly: true});
   introSnowflakeStage.addChild( introSnowflake.graphics );
 
   jingleSound = new Howl({

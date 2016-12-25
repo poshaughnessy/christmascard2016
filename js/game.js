@@ -79,7 +79,7 @@ function updateOnFrame() {
 }
 
 function updateIntroOnFrame() {
-  introSnowflake.rotate += 0.05;
+  introSnowflake.graphics.rotation += 0.01;
 }
 
 function destroyDeletedSnowflakes() {

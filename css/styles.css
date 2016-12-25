@@ -12,6 +12,7 @@ h1 {
 
 .instructions {
   margin-top: 1.5em;
+  font-size: 1.2em;
   font-style: italic;
 }
 
@@ -59,7 +60,7 @@ button {
   background-color: #7754ff;
   border: 0;
   border-radius: 8px;
-  padding: 10px 20px;
+  padding: 10px 40px;
 }
 
 #intro-start {
