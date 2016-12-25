@@ -22,13 +22,83 @@ var container = document.getElementById('container');
 var renderer = new PIXI.autoDetectRenderer(width, height, {transparent: false, antialias: true});
 var stage = new PIXI.Container();
 
+var jingleSound;
+
 var Snowflake = function() {
   this.speed = getRandomBetween(SNOWFLAKE_SPEED_MIN, SNOWFLAKE_SPEED_MAX);
   this.size = getRandomBetween(SNOWFLAKE_SIZE_MIN, SNOWFLAKE_SIZE_MAX);
-  this.position = getRandomStartingPosition(this.size);
-  this.rotation = getRandomStartingRotation();
   this.rotateSpeed = getRandomBetween(SNOWFLAKE_ROTATE_SPEED_MIN, SNOWFLAKE_ROTATE_SPEED_MAX);
-  this.graphics = createGraphics(this.size, this.position, this.rotation);
+  this.graphics = createGraphics(this.size, getRandomStartingPosition(this.size), getRandomStartingRotation());
+  this.colliding = false;
+};
+
+Snowflake.prototype.getPosition = function() {
+  return this.graphics.position;
+};
+
+Snowflake.prototype.updatePosition = function() {
+  this.graphics.position.y += this.speed;
+};
+
+Snowflake.prototype.updateRotation = function() {
+  this.graphics.rotation += this.rotateSpeed;
+};
+
+/**
+ * @returns boolean Whether or not it is newly colliding
+ */
+Snowflake.prototype.updateCollisions = function(snowflakes) {
+
+  var newCollision = false;
+  var thisPosition = this.getPosition();
+
+  if (thisPosition.y < 0) {
+    // Off-screen
+    this.colliding = false;
+    return newCollision;
+  }
+
+  if (this.colliding) {
+    return newCollision;
+  }
+
+  var colliding = false;
+
+  for (var i=0; i < snowflakes.length; i++) {
+
+    var snowflake = snowflakes[i];
+    var snowflakePosition = snowflake.getPosition();
+
+    // Check it's not this snowflake
+    if (snowflake.index !== this.index) {
+
+      var xdist = snowflakePosition.x - thisPosition.x;
+      if (xdist > -snowflake.size/2 && xdist < snowflake.size/2) {
+
+        var ydist = snowflakePosition.y - thisPosition.y;
+        if (ydist > -snowflake.size/2 && ydist < snowflake.size/2) {
+
+          colliding = true;
+        }
+      }
+
+      if (colliding) {
+
+        // If snowflake we're colliding with isn't already colliding, register a new one
+        if (!snowflake.colliding) {
+          console.log('Collision', this.index, snowflake.index);
+          newCollision = true;
+        }
+
+        break;
+      }
+    }
+  }
+
+  this.colliding = colliding;
+
+  return newCollision;
+
 };
 
 var snowflakes = [];
@@ -45,9 +115,14 @@ function init() {
 
   for (var i=0; i < snowflakeRate; i++) {
     var snowflake = new Snowflake();
+    snowflake.index = i;
     stage.addChild( snowflake.graphics );
     snowflakes.push( snowflake );
   }
+
+  jingleSound = new Howl({
+    src: ['audio/jingle.mp3', 'audio/jingle.wav']
+  });
 
   animate();
 
@@ -148,12 +223,20 @@ function updateOnFrame() {
   for (var i=0; i < snowflakes.length; i++) {
 
     var snowflake = snowflakes[i];
+    var position = snowflake.getPosition();
 
-    if (snowflake.graphics.position.y < height + snowflake.size) {
+    if (position.y < height + snowflake.size) {
 
       // Still going...
-      snowflake.graphics.position.y += snowflake.speed;
-      snowflake.graphics.rotation += snowflake.rotateSpeed;
+      snowflake.updatePosition();
+      snowflake.updateRotation();
+
+      var hasNewCollisions = snowflake.updateCollisions(snowflakes);
+
+      if (hasNewCollisions) {
+        console.log('New collisions, play song', snowflake.index, snowflake.collidingWith);
+        jingleSound.play();
+      }
 
     } else {
 
@@ -162,6 +245,7 @@ function updateOnFrame() {
       snowflake.graphics.position.x = pos.x;
       snowflake.graphics.position.y = pos.y;
     }
+
   }
 
 }
