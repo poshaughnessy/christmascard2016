@@ -1,5 +1,5 @@
 var SNOWFLAKE_COLOUR = 0xFFFFFF;
-var SNOWFLAKE_RATE_DEFAULT = 100;
+var SNOWFLAKE_RATE_DEFAULT = 30;
 
 var SNOWFLAKE_SIZE_MIN = 30;
 var SNOWFLAKE_SIZE_MAX = 60;
@@ -10,7 +10,7 @@ var SNOWFLAKE_SPEED_MAX = 2;
 var SNOWFLAKE_ROTATE_SPEED_MIN = -0.025;
 var SNOWFLAKE_ROTATE_SPEED_MAX = 0.025;
 
-var LOGOS = ['sbrowser5.svg', 'bubble.svg', 'podle.svg', 'snapwat.svg'];
+var LOGOS = ['sbrowser5-simple.svg', 'bubble.svg', 'podle-simple.svg', 'snapwat-simple.svg'];
 var LOGOS_RATIO = 0.25;
 
 var snowflakeRate = SNOWFLAKE_RATE_DEFAULT;
