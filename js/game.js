@@ -105,6 +105,8 @@ function isGameComplete() {
     }
   }
 
+  return !nonLogoSnowflakesRemaining;
+
 }
 
 function checkGameComplete() {
