@@ -5,15 +5,16 @@ var jingleSound;
 var snowflakes = [];
 
 function onSnowflakeClick(snowflake) {
-  console.log('click!', snowflake);
-  if (snowflake.isLogo) {
-    updateScore(-3);
-  } else {
-    updateScore(1);
-  }
+  console.log('click snowflake!', snowflake);
+  updateScore(1);
   snowflake.markDeleted = true;
 }
 
+function onLogoSnowflakeClick(snowflake) {
+  console.log('click logo snowflake!', snowflake);
+  updateScore(-3);
+  snowflake.markDeleted = true;
+}
 
 function getIndexOfSnowflake(snowflakeId) {
 

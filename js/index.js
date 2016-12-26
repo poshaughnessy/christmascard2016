@@ -1,5 +1,4 @@
 var SNOWFLAKE_COLOUR = 0xFFFFFF;
-var SNOWFLAKE_RATE_DEFAULT = 30;
 
 var SNOWFLAKE_SIZE_MIN = 30;
 var SNOWFLAKE_SIZE_MAX = 60;
@@ -13,7 +12,8 @@ var SNOWFLAKE_ROTATE_SPEED_MAX = 0.025;
 var LOGOS = ['sbrowser5-simple.svg', 'bubble.svg', 'podle-simple.svg', 'snapwat-simple.svg'];
 var LOGOS_RATIO = 0.25;
 
-var snowflakeRate = SNOWFLAKE_RATE_DEFAULT;
+var numSnowflakes = 20;
+var numLogos = 10;
 
 var width = window.innerWidth;
 var height = window.innerHeight;
@@ -22,6 +22,8 @@ var snowflakeContainer = document.getElementById('snowflake');
 var scoreElement = document.getElementById('score');
 var introElement = document.getElementById('intro');
 var resultElement = document.getElementById('result');
+var resultScoreElement = document.getElementById('result-score');
+var resultMessageElement = document.getElementById('result-message');
 var startButton = document.getElementById('intro-start');
 var replayButton = document.getElementById('result-retry');
 
@@ -46,7 +48,7 @@ function init() {
 
   snowflakeContainer.appendChild(introRenderer.view);
 
-  introSnowflake = new Snowflake(null, {displayOnly: true});
+  introSnowflake = new Snowflake(false, null, {displayOnly: true});
   introSnowflakeStage.addChild( introSnowflake.graphics );
 
   jingleSound = new Howl({
@@ -77,9 +79,18 @@ function init() {
 
 function setupSnowflakes() {
 
-  for (var i=0; i < snowflakeRate; i++) {
-    var snowflake = new Snowflake({onClick: onSnowflakeClick});
+  var snowflake;
+
+  for (var i=0; i < numSnowflakes; i++) {
+    snowflake = new Snowflake(false, {onClick: onSnowflakeClick});
     snowflake.id = i;
+    stage.addChild( snowflake.graphics );
+    snowflakes.push( snowflake );
+  }
+
+  for (var j=0; j < numLogos; j++) {
+    snowflake = new Snowflake(true, {onClick: onLogoSnowflakeClick});
+    snowflake.id = numSnowflakes + j;
     stage.addChild( snowflake.graphics );
     snowflakes.push( snowflake );
   }
@@ -87,9 +98,28 @@ function setupSnowflakes() {
 }
 
 function displayResult() {
+  resultScoreElement.innerHTML = score;
+  resultMessageElement.innerHTML = getResultMessage();
   resultElement.style.display = 'block';
 }
 
+function getResultMessage() {
+
+  var logosRemaining = snowflakes.length;
+
+  if (logosRemaining === numLogos) {
+    return 'Perfect score. There\'s <em>snow</em> better!';
+  } else if (logosRemaining >= numLogos * 0.75) {
+    return '<em>Snow</em> close!';
+  } else if (logosRemaining >= numLogos * 0.5) {
+    return 'N-<em>ice</em>-ly done';
+  } else if (logosRemaining >= numLogos * 0.25) {
+    return 'Hmm, you get a <em>frosty</em> reception!';
+  } else {
+    return 'You snow-<em>flaked</em> out!';
+  }
+
+}
 
 function animate() {
   // start the timer for the next animation loop

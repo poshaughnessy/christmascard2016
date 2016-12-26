@@ -2,7 +2,7 @@ var DISPLAY_ONLY_SIZE = 90;
 var DISPLAY_ONLY_X = 75;
 var DISPLAY_ONLY_Y = 75;
 
-var Snowflake = function(callbacks, options) {
+var Snowflake = function(isLogo, callbacks, options) {
 
   // Refactor me!
   this.callbacks = callbacks || {};
@@ -12,7 +12,7 @@ var Snowflake = function(callbacks, options) {
   this.size = this.options.displayOnly ? DISPLAY_ONLY_SIZE : getRandomBetween(SNOWFLAKE_SIZE_MIN, SNOWFLAKE_SIZE_MAX);
   this.rotateSpeed = getRandomBetween(SNOWFLAKE_ROTATE_SPEED_MIN, SNOWFLAKE_ROTATE_SPEED_MAX);
 
-  this.isLogo = this.options.displayOnly ? false : Math.random() <= LOGOS_RATIO;
+  this.isLogo = isLogo;
   var position = this.options.displayOnly ? {x: DISPLAY_ONLY_X, y: DISPLAY_ONLY_Y} :
     getRandomStartingPosition(this.size);
   var rotation = this.options.displayOnly ? 0 : getRandomStartingRotation();
