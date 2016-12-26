@@ -10,10 +10,9 @@ var SNOWFLAKE_ROTATE_SPEED_MIN = -0.025;
 var SNOWFLAKE_ROTATE_SPEED_MAX = 0.025;
 
 var LOGOS = ['sbrowser5-simple.svg', 'bubble.svg', 'podle-simple.svg', 'snapwat-simple.svg'];
-var LOGOS_RATIO = 0.25;
 
-var numSnowflakes = 20;
-var numLogos = 10;
+var numSnowflakes = 25;
+var numLogos = 15;
 
 var width = window.innerWidth;
 var height = window.innerHeight;
@@ -63,7 +62,7 @@ function init() {
   });
 
   replayButton.addEventListener('click', function() {
-    for (var i=snowflakes.length; i >= 0; i--) {
+    for (var i = snowflakes.length - 1; i >= 0; i--) {
       var snowflake = snowflakes[i];
       destroySnowflake(snowflake);
     }
@@ -71,6 +70,7 @@ function init() {
     setupSnowflakes();
     resultElement.style.display = 'none';
     paused = false;
+    updateScore(-score);
   });
 
   animate();
