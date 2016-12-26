@@ -1,17 +1,20 @@
 var score = 0;
 var paused = true;
 var jingleSound;
+var buzzSound;
 
 var snowflakes = [];
 
 function onSnowflakeClick(snowflake) {
   console.log('click snowflake!', snowflake);
+  jingleSound.play();
   updateScore(1);
   snowflake.markDeleted = true;
 }
 
 function onLogoSnowflakeClick(snowflake) {
   console.log('click logo snowflake!', snowflake);
+  buzzSound.play();
   updateScore(-3);
   snowflake.markDeleted = true;
 }
@@ -60,12 +63,12 @@ function updateOnFrame() {
       snowflake.updatePosition();
       snowflake.updateRotation();
 
-      var hasNewCollisions = snowflake.updateCollisions(snowflakes);
-
-      if (hasNewCollisions) {
-        console.log('New collisions, play song', snowflake.id, snowflake.collidingWith);
-        jingleSound.play();
-      }
+      //var hasNewCollisions = snowflake.updateCollisions(snowflakes);
+      //
+      //if (hasNewCollisions) {
+      //  console.log('New collisions, play song', snowflake.id, snowflake.collidingWith);
+      //  jingleSound.play();
+      //}
 
     } else {
 

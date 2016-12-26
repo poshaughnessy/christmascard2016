@@ -53,10 +53,8 @@ Snowflake.prototype.updateRotation = function() {
   this.graphics.rotation += this.rotateSpeed;
 };
 
-/**
- * Refactor me!
- * @returns boolean Whether or not it is newly colliding
- */
+// No longer used
+/*
 Snowflake.prototype.updateCollisions = function(snowflakes) {
 
   var isNewCollision = false;
@@ -115,6 +113,7 @@ Snowflake.prototype.updateCollisions = function(snowflakes) {
   return isNewCollision;
 
 };
+*/
 
 
 /**

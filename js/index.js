@@ -55,6 +55,11 @@ function init() {
   });
   jingleSound.volume(0.5);
 
+  buzzSound = new Howl({
+    src: ['audio/buzz.mp3', 'audio/buzz.wav']
+  });
+  buzzSound.volume(0.5);
+
   startButton.addEventListener('click', function() {
     introElement.style.display = 'none';
     container.style.display = 'block';
